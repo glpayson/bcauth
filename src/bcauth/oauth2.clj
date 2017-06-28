@@ -4,11 +4,12 @@
    [clj-jwt.key   :refer [private-key]]
    [clj-time.core :refer [now plus minutes]]
    [clj-http.client :as client]
-   [clojure.data.codec.base64 :as b64]
    [cheshire.core :refer :all]))
 
-(defn base64-encode [str]
-  (String. (b64/encode (.getBytes str))))
+(defn parse-token [resp]
+  (-> (:body resp)
+      (parse-string true)
+      (:access_token)))
 
 (defn claim [url cid sig]
   {:iss cid
@@ -17,8 +18,10 @@
    :exp (plus (now) (minutes 30))})
 
 (defn signed-claim [url cid sig]
-  (let [cl (claim url cid sig)]
-    (-> cl jwt (sign :HS512 sig) to-str)))
+  (-> (claim url cid sig) 
+      jwt 
+      (sign :HS512 sig) 
+      to-str)))
 
 (defn form-params [url cid sig]
   {:form-params
@@ -26,11 +29,6 @@
     :client_assertion_type "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     :client_assertion (signed-claim url cid sig)
     :client_id cid}})
-
-(defn parse-token [resp]
-  (-> (:body resp)
-      (parse-string true)
-      (:access_token)))
 
 (defn get-token [url cid sig]
   (->> (form-params url cid sig)
