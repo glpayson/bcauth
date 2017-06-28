@@ -1,6 +1,6 @@
 # bcauth
 
-A Clojure library designed to ... well, that part is up to you.
+Get oauth2 tokens (in a specific way..)
 
 ## Usage
 
