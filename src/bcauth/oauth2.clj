@@ -23,12 +23,14 @@
 (defn form-params [url cid sig]
   {:form-params
    {:grant_type "client_credentials"
-   :client_assertion_type "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-   :client_assertion (signed-claim url cid sig)
+    :client_assertion_type "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    :client_assertion (signed-claim url cid sig)
     :client_id cid}})
 
 (defn parse-token [resp]
-  (def rrr resp))
+  (-> (:body resp)
+      (parse-string true)
+      (:access_token)))
 
 (defn get-token [url cid sig]
   (->> (form-params url cid sig)
