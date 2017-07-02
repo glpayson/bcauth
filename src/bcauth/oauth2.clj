@@ -21,7 +21,7 @@
   (-> (claim url cid sig) 
       jwt 
       (sign :HS512 sig) 
-      to-str)))
+      to-str))
 
 (defn form-params [url cid sig]
   {:form-params
